@@ -1,0 +1,207 @@
+---
+title: "Overview"
+description: "This guide provides a comprehensive look at ZephyrDB's architecture, design principles, and core concepts that make it the ideal choice for modern application development."
+---
+## Architecture Philosophy
+
+ZephyrDB is built on three foundational principles that differentiate it from traditional databases:
+
+<AccordionGroup>
+    <Accordion title="WebSocket-First Communication">
+        Unlike REST APIs that require multiple round trips, ZephyrDB uses persistent WebSocket connections for all operations.
+
+        <Tabs>
+            <Tab title="Traditional REST">
+                ```javascript
+                // Multiple HTTP requests required
+                const response1 = await fetch('/api/users/123');
+                const user = await response1.json();
+
+                const response2 = await fetch('/api/users/123/posts');
+                const posts = await response2.json();
+
+                // No real-time updates without polling
+                setInterval(async () => {
+                const updated = await fetch('/api/users/123');
+                // Check for changes...
+            }, 1000);
+                ```
+            </Tab>
+
+            <Tab title="ZephyrDB WebSocket">
+                ```javascript
+                // Single persistent connection
+                const db = new ZephyrDB('project-id');
+
+                // All operations through one connection
+                const user = await db.get('users/123');
+                const posts = await db.get('users/123/posts');
+
+                // Real-time updates automatically
+                db.watch('update', 'users/123').then(updatedUser => {
+                // Instant updates without polling
+            });
+                ```
+            </Tab>
+        </Tabs>
+
+        <Check>
+            **Benefits**: Reduced latency, persistent connections, bi-directional communication, and automatic real-time synchronization
+        </Check>
+    </Accordion>
+
+    <Accordion title="Key-Path Data Structure">
+        ZephyrDB organizes data using intuitive file-system-like paths instead of complex query languages.
+
+        ```javascript
+        // Hierarchical data organization
+        users/
+        ├── john/
+        │   ├── profile/name
+        │   ├── profile/email
+        │   └── todos/
+        │       ├── task-1
+        │       └── task-2
+        └── jane/
+        └── settings/theme
+        ```
+
+        <CodeGroup>
+            ```javascript Simple Paths
+            // Access data with intuitive paths
+            await db.get('users/john/profile/name');
+            await db.create('users/john/todos/new-task', {
+            text: 'Learn ZephyrDB'
+        });
+
+            // Nested operations work naturally
+            await db.update('users/john/profile', {
+            name: 'John Doe',
+            lastLogin: Date.now()
+        });
+            ```
+
+            ```javascript Complex Queries Made Simple
+            // Traditional SQL-like complexity
+            SELECT p.*, t.* FROM profiles p
+            JOIN todos t ON p.user_id = t.user_id
+            WHERE p.user_id = 'john';
+
+            // ZephyrDB simplicity
+            const profile = await db.get('users/john/profile');
+            const todos = await db.get('users/john/todos');
+            ```
+        </CodeGroup>
+    </Accordion>
+
+    <Accordion title="Truly Global Edge Network">
+        ZephyrDB automatically replicates **every database** across our global edge network. No configuration, no region selection - just instant global availability.
+
+        <Steps>
+            <Step title="Zero Configuration Global Deployment">
+                Every ZephyrDB database is instantly available worldwide through our edge network.
+            </Step>
+
+            <Step title="Intelligent Routing">
+                Requests automatically route to the optimal edge location for best performance.
+
+                <Note>
+                    Users in Tokyo, London, and New York all get sub-50ms response times from the same database - automatically.
+                </Note>
+            </Step>
+
+            <Step title="Seamless Consistency">
+                Global replication with automatic conflict resolution ensures data consistency worldwide.
+            </Step>
+        </Steps>
+
+        <Check>
+            **No Region Management**: Unlike AWS or Google Cloud, you never choose regions, configure replication, or manage global distribution. ZephyrDB handles everything automatically.
+        </Check>
+    </Accordion>
+</AccordionGroup>
+
+## Core Technical Concepts
+
+### Event-Driven Architecture
+
+Every operation in ZephyrDB generates events that can be watched and reacted to in real-time.
+
+<AccordionGroup>
+    <Accordion title="CRUD Events">
+        ```javascript
+        // Watch for specific operations
+        db.watch('create', 'users/*').then(newUser => {
+        console.log('New user registered:', newUser);
+    });
+
+        db.watch('update', 'posts/*/likes').then(updatedLikes => {
+        console.log('Post likes updated:', updatedLikes);
+    });
+
+        db.watch('delete', 'comments/*').then(deletedComment => {
+        console.log('Comment deleted:', deletedComment);
+    });
+        ```
+    </Accordion>
+
+    <Accordion title="Wildcard Patterns">
+        ```javascript
+        // Watch entire subtrees
+        db.watch('update', 'users/john/*').then(change => {
+        // Any change under users/john/
+    });
+
+        // Watch specific patterns
+        db.watch('create', 'teams/*/members/*').then(newMember => {
+        // New member added to any team
+    });
+        ```
+    </Accordion>
+</AccordionGroup>
+
+## Automatic Scaling Model
+
+ZephyrDB scales seamlessly across the global edge network without any configuration:
+
+<Steps>
+    <Step title="Global Load Distribution">
+        Traffic automatically balances across all edge locations based on real-time demand
+    </Step>
+
+    <Step title="Elastic Edge Computing">
+        Each edge location scales computing resources up and down automatically
+    </Step>
+
+    <Step title="Zero-Downtime Scaling">
+        Scale from zero to millions of users with no configuration changes or downtime
+    </Step>
+</Steps>
+
+<Warning>
+    **No Infrastructure Management**: Unlike traditional databases, you never provision servers, configure regions, or manage scaling. ZephyrDB handles everything automatically.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+    <Card title="Quick Start Guide" href="/quickstart" icon="play">
+        Start building with ZephyrDB in under 5 minutes
+    </Card>
+
+    <Card title="API Reference" href="/api-reference" icon="code">
+        Complete API documentation with all methods and options
+    </Card>
+
+    <Card title="Best Practices" href="/guides/best-practices" icon="star">
+        Performance optimization and architectural patterns
+    </Card>
+
+    <Card title="Migration Guides" href="/guides/migration" icon="arrow-right">
+        Move from Firebase, Supabase, and other databases
+    </Card>
+</CardGroup>
+
+<Card title="🚀 Join the Waitlist - Coming Q2 2025" href="https://zephyrdb.com" icon="rocket">
+    Be among the first to build with truly global, zero-configuration database infrastructure. Get early access, free credits, and lifetime benefits.
+</Card>
