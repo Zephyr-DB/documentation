@@ -22,10 +22,6 @@
             ]
           }
         ]
-      },
-      {
-        "tab": "HTTP API",
-        "openapi": "https://mc-5ytk09xl6f.bunny.run/openapi.json"
       }
     ],
     "global": {
